@@ -1,8 +1,21 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
+
+import { motion, useAnimation } from "framer-motion";
+import { useInView } from "react-intersection-observer";
 import { SubHeading } from '../../components';
 import { images, data } from '../../constants';
 import './Laurels.css';
+
+const imageVariants = {
+  visible: { opacity: 1, scale: 1 , transition: {delay: 0.3, duration: 1 } },
+  hidden: { opacity: 0, scale: 0 },
+};
+
+const contentVariants = {
+  visible: { opacity: 1, x: 50, transition: { duration: 1 } },
+  hidden: { opacity: 0, x: -50 },
+};
 
 const AwardCard = ({ award: { imgUrl, title, subtitle } }) => (
   <div className="app__laurels_awards-card">
@@ -14,21 +27,39 @@ const AwardCard = ({ award: { imgUrl, title, subtitle } }) => (
   </div>
 );
 
-const Laurels = () => (
+const Laurels = () => {
+  const controls = useAnimation();
+  const [ref, inView] = useInView();
+  useEffect(() => {
+    if (inView) {
+      controls.start("visible");
+    }
+  }, [controls, inView]);
+  return (
   <div className="app__bg app__wrapper section__padding" id="awards">
-    <div className="app__wrapper_info">
+    <motion.div 
+     ref={ref}
+     animate={controls}
+     initial="hidden"
+     variants={contentVariants}
+    className="app__wrapper_info">
       <SubHeading title="Awards & recognition" />
       <h1 className="headtext__cormorant">Our Laurels</h1>
 
       <div className="app__laurels_awards">
         {data.awards.map((award) => <AwardCard award={award} key={award.title} />)}
       </div>
-    </div>
+    </motion.div>
 
-    <div className="app__wrapper_img">
+    <motion.div 
+    ref={ref}
+    animate={controls}
+    initial="hidden"
+    variants={imageVariants}
+    className="app__wrapper_img">
       <img src={images.laurels} alt="laurels_img" />
-    </div>
+    </motion.div>
   </div>
-);
+)};
 
 export default Laurels;
